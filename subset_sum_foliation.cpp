@@ -11,93 +11,223 @@ int chooseModulus(int n, int T) {
     return min(T + 1, n * 100);  // Example heuristic for choosing m dynamically
 }
 
-// Function to find if any subset has a sum that equals T
-bool subsetSumFoliation(const vector<int>& arr, int T) {
+// Optimized function to find if any subset has a sum that equals T
+bool hasSubsetSumFoliation(const vector<int>& arr, int T) {
     int n = arr.size();
-    int m = chooseModulus(n, T);  // Dynamically set modulus m based on input size and target
+    int m = chooseModulus(n, T);  // Dynamically set modulus m
 
-    // Layered representation: map (subset size -> {sum modulo m -> count})
-    vector<unordered_map<int, int>> layers(n + 1);  // Now we track all subset sizes up to n
-    layers[0][0] = 1;  // Base case: sum 0 with subset size 0
+    unordered_map<int, int> current, next;
+    current[0] = 1;  // Base case: sum 0 with subset size 0
 
     for (int num : arr) {
-        // Update layers from largest subset size down to avoid overwriting
-        for (int i = n; i > 0; --i) {
-            for (auto& [modSum, count] : layers[i - 1]) {
-                int newModSum = (modSum + num) % m;
-                layers[i][newModSum] += count;
-            }
+        next = current;  // Copy current state to next
+
+        for (auto& [modSum, count] : current) {
+            int newModSum = (modSum + num) % m;
+            next[newModSum] += count;  // Update the new subset sums
         }
+
+        current = move(next);  // Move next to current to save copying overhead
     }
 
-    // Check if any subset of any size achieves T % m
-    int targetMod = T % m;
-    for (int i = 0; i <= n; ++i) {
-        if (layers[i].find(targetMod) != layers[i].end()) {
-            return true;  // A subset of some size has the desired sum
-        }
-    }
-    return false;
+    // Check if the target modulo exists in the current map
+    return current.find(T % m) != current.end();
 }
 
-// Function to find if a subset of size s exists with a sum T
-bool subsetSumFoliation(const vector<int>& arr, int T, int s) {
-    int n = arr.size();
-    int m = chooseModulus(n, T);  // Dynamically set modulus m based on input size and target
 
-    // Layered representation: map (subset size -> {sum modulo m -> count})
-    vector<unordered_map<int, int>> layers(s + 1);
-    layers[0][0] = 1; // Base case: sum 0 with subset size 0
+// Optimized function to check if a subset of size s has sum T
+bool hasSubsetSumFoliation(const vector<int>& arr, int T, int s) {
+    int n = arr.size();
+    int m = chooseModulus(n, T);  // Dynamically set modulus m
+
+    // Maps: (modSum, subsetSize) -> count
+    unordered_map<int, unordered_map<int, int>> current, next;
+    current[0][0] = 1; // Base case: subset size 0, sum 0
 
     for (int num : arr) {
-        // Update layers from largest subset size down to avoid overwriting
-        for (int i = s; i > 0; --i) {
-            for (auto& [modSum, count] : layers[i - 1]) {
-                int newModSum = (modSum + num) % m;
-                layers[i][newModSum] += count;
+        next = current;  // Copy current state to next
+
+        for (auto& [modSum, sizeMap] : current) {
+            for (auto& [subsetSize, count] : sizeMap) {
+                if (subsetSize < s) {  // Only update if subset size is valid
+                    int newModSum = (modSum + num) % m;
+                    next[newModSum][subsetSize + 1] += count;  // Update subset size and sum
+                }
             }
         }
+
+        current = move(next);  // Move next to current to save copying overhead
     }
 
-    // Check if any subset of size s achieves T % m
+    // Check if a subset of size s achieves T % m
     int targetMod = T % m;
-    return layers[s].find(targetMod) != layers[s].end();
+    return current.find(targetMod) != current.end() && current[targetMod].find(s) != current[targetMod].end();
 }
+
 
 // Function to find if a subset of size s exists with a sum T and modulus m
-bool subsetSumFoliation(const vector<int>& arr, int T, int s, int m
-                        /*Choose a sufficiently large modulus to handle collisions*/){
+bool hasSubsetSumFoliation(const vector<int>& arr, int T, int s, int m
+                        /*Choose a sufficiently large modulus to handle collisions*/) {
     int n = arr.size();
 
-    // Layered representation: map (subset size -> {sum modulo m -> count})
-    vector<unordered_map<int, int>> layers(s + 1);
-    layers[0][0] = 1; // Base case: sum 0 with subset size 0
+    // Maps: (modSum, subsetSize) -> count
+    unordered_map<int, unordered_map<int, int>> current, next;
+    current[0][0] = 1; // Base case: subset size 0, sum 0
 
     for (int num : arr) {
-        // Update layers from largest subset size down to avoid overwriting
-        for (int i = s; i > 0; --i) {
-            for (auto& [modSum, count] : layers[i - 1]) {
-                int newModSum = (modSum + num) % m;
-                layers[i][newModSum] += count;
+        next = current;  // Copy current state to next
+
+        for (auto& [modSum, sizeMap] : current) {
+            for (auto& [subsetSize, count] : sizeMap) {
+                if (subsetSize < s) {  // Only update if subset size is valid
+                    int newModSum = (modSum + num) % m;
+                    next[newModSum][subsetSize + 1] += count;  // Update subset size and sum
+                }
             }
         }
+
+        current = move(next);  // Move next to current to save copying overhead
     }
 
-    // Check if any subset of size s achieves T % m
+    // Check if a subset of size s achieves T % m
     int targetMod = T % m;
-    return layers[s].find(targetMod) != layers[s].end();
+    return current.find(targetMod) != current.end() && current[targetMod].find(s) != current[targetMod].end();
+}
+
+// Function to find and print subsets of size s whose sum is T
+void printSubsetSumFoliation(const vector<int>& arr, int T) {
+    int n = arr.size();
+    int m = chooseModulus(n, T);  // Dynamically choose modulus
+
+    unordered_map<int, vector<vector<int>>> current, next;
+    current[0] = { { } };  // Base case: subset with sum 0 is empty
+
+    for (int num : arr) {
+        next = current;  // Copy current state to next
+
+        for (auto& [modSum, subsets] : current) {
+            int newModSum = (modSum + num) % m;
+
+            for (auto& subset : subsets) {
+                vector<int> newSubset = subset;
+                newSubset.push_back(num);
+                next[newModSum].push_back(newSubset);
+            }
+        }
+
+        current = move(next);  // Update current state
+    }
+
+    // Check for subsets with sum T % m
+    int targetMod = T % m;
+    if (current.find(targetMod) != current.end()) {
+        cout << "Subsets with sum " << T << " are:" << endl;
+        for (auto& subset : current[targetMod]) {
+            cout << "{ ";
+            for (int num : subset) {
+                cout << num << " ";
+            }
+            cout << "}" << endl;
+        }
+    } else {
+        cout << "No subsets with sum " << T << " exist." << endl;
+    }
+}
+
+
+// Function to find and print subsets of size s whose sum is T
+void printSubsetSumFoliation(const vector<int>& arr, int T, int s) {
+    int n = arr.size();
+    int m = chooseModulus(n, T);  // Dynamically choose modulus
+
+    unordered_map<int, unordered_map<int, vector<vector<int>>>> current, next;
+    current[0][0] = { { } };  // Base case: subset size 0, sum 0 is empty
+
+    for (int num : arr) {
+        next = current;  // Copy current state to next
+
+        for (auto& [modSum, sizeMap] : current) {
+            for (auto& [subsetSize, subsets] : sizeMap) {
+                if (subsetSize < s) {  // Update only if valid subset size
+                    int newModSum = (modSum + num) % m;
+
+                    for (auto& subset : subsets) {
+                        vector<int> newSubset = subset;
+                        newSubset.push_back(num);
+                        next[newModSum][subsetSize + 1].push_back(newSubset);
+                    }
+                }
+            }
+        }
+
+        current = move(next);  // Update current state
+    }
+
+    // Check for subsets of size s with sum T % m
+    int targetMod = T % m;
+    if (current.find(targetMod) != current.end() && current[targetMod].find(s) != current[targetMod].end()) {
+        cout << "Subsets of size " << s << " with sum " << T << " are:" << endl;
+        for (auto& subset : current[targetMod][s]) {
+            cout << "{ ";
+            for (int num : subset) {
+                cout << num << " ";
+            }
+            cout << "}" << endl;
+        }
+    } else {
+        cout << "No subsets of size " << s << " with sum " << T << " exist." << endl;
+    }
+}
+
+// Function to find and print subsets of size s whose sum is T and modulus is m
+void printSubsetSumFoliation(const vector<int>& arr, int T, int s, int m) {
+    int n = arr.size();
+
+    unordered_map<int, unordered_map<int, vector<vector<int>>>> current, next;
+    current[0][0] = { { } };  // Base case: subset size 0, sum 0 is empty
+
+    for (int num : arr) {
+        next = current;  // Copy current state to next
+
+        for (auto& [modSum, sizeMap] : current) {
+            for (auto& [subsetSize, subsets] : sizeMap) {
+                if (subsetSize < s) {  // Update only if valid subset size
+                    int newModSum = (modSum + num) % m;
+
+                    for (auto& subset : subsets) {
+                        vector<int> newSubset = subset;
+                        newSubset.push_back(num);
+                        next[newModSum][subsetSize + 1].push_back(newSubset);
+                    }
+                }
+            }
+        }
+
+        current = move(next);  // Update current state
+    }
+
+    // Check for subsets of size s with sum T % m
+    int targetMod = T % m;
+    if (current.find(targetMod) != current.end() && current[targetMod].find(s) != current[targetMod].end()) {
+        cout << "Subsets of size " << s << " with sum " << T << " are:" << endl;
+        for (auto& subset : current[targetMod][s]) {
+            cout << "{ ";
+            for (int num : subset) {
+                cout << num << " ";
+            }
+            cout << "}" << endl;
+        }
+    } else {
+        cout << "No subsets of size " << s << " with sum " << T << " exist." << endl;
+    }
 }
 
 // Example Usage
 int main() {
     vector<int> arr = {-625, -5, -1, -4, 2, 74523, 15, -62, -7, -8, -9, 396, -10};
-    int T = 74294; // Target sum
+    int T = 74293; // Target sum
 
-    if (subsetSumFoliation(arr, T)) {
-        cout << "Subset with sum " << T << " exists." << endl;
-    } else {
-        cout << "No such subset exists." << endl;
-    }
+	printSubsetSumFoliation(arr, T, 8);
 
     return 0;
 }
