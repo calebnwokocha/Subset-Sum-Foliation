@@ -34,7 +34,6 @@ bool hasSubsetSumFoliation(const vector<int>& arr, int T) {
     return current.find(T % m) != current.end();
 }
 
-
 // Optimized function to check if a subset of size s has sum T
 bool hasSubsetSumFoliation(const vector<int>& arr, int T, int s) {
     int n = arr.size();
@@ -224,10 +223,10 @@ void printSubsetSumFoliation(const vector<int>& arr, int T, int s, int m) {
 
 // Example Usage
 int main() {
-    vector<int> arr = {-625, -5, -1, -4, 2, 74523, 15, -62, -7, -8, -9, 396, -10};
-    int T = 74293; // Target sum
+    vector<int> arr = {-625, -5, -1, -4, 2, 11174523, 15, -62, -7, -8, -9, 396, -10};
+    int T = 11174293; // Target sum
 
-	printSubsetSumFoliation(arr, T, 8);
+	printSubsetSumFoliation(arr, T, 9);
 
     return 0;
 }
