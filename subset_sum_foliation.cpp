@@ -12,7 +12,7 @@ int chooseModulus(int n, int T) {
 }
 
 // Optimized function to find if any subset has a sum that equals T
-bool hasSubsetSumFoliation(const vector<int>& arr, int T) {
+bool hasSubsetSum(const vector<int>& arr, int T) {
     int n = arr.size();
     int m = chooseModulus(n, T);  // Dynamically set modulus m
 
@@ -35,7 +35,7 @@ bool hasSubsetSumFoliation(const vector<int>& arr, int T) {
 }
 
 // Optimized function to check if a subset of size s has sum T
-bool hasSubsetSumFoliation(const vector<int>& arr, int T, int s) {
+bool hasSubsetSum(const vector<int>& arr, int T, int s) {
     int n = arr.size();
     int m = chooseModulus(n, T);  // Dynamically set modulus m
 
@@ -65,7 +65,7 @@ bool hasSubsetSumFoliation(const vector<int>& arr, int T, int s) {
 
 
 // Function to find if a subset of size s exists with a sum T and modulus m
-bool hasSubsetSumFoliation(const vector<int>& arr, int T, int s, int m
+bool hasSubsetSum(const vector<int>& arr, int T, int s, int m
                         /*Choose a sufficiently large modulus to handle collisions*/) {
     int n = arr.size();
 
@@ -94,7 +94,7 @@ bool hasSubsetSumFoliation(const vector<int>& arr, int T, int s, int m
 }
 
 // Function to find and print subsets of size s whose sum is T
-void printSubsetSumFoliation(const vector<int>& arr, int T) {
+void printSubsetSum(const vector<int>& arr, int T) {
     int n = arr.size();
     int m = chooseModulus(n, T);  // Dynamically choose modulus
 
@@ -135,7 +135,7 @@ void printSubsetSumFoliation(const vector<int>& arr, int T) {
 
 
 // Function to find and print subsets of size s whose sum is T
-void printSubsetSumFoliation(const vector<int>& arr, int T, int s) {
+void printSubsetSum(const vector<int>& arr, int T, int s) {
     int n = arr.size();
     int m = chooseModulus(n, T);  // Dynamically choose modulus
 
@@ -179,7 +179,7 @@ void printSubsetSumFoliation(const vector<int>& arr, int T, int s) {
 }
 
 // Function to find and print subsets of size s whose sum is T and modulus is m
-void printSubsetSumFoliation(const vector<int>& arr, int T, int s, int m) {
+void printSubsetSum(const vector<int>& arr, int T, int s, int m) {
     int n = arr.size();
 
     unordered_map<int, unordered_map<int, vector<vector<int>>>> current, next;
@@ -226,7 +226,7 @@ int main() {
     vector<int> arr = {-625, -5, -1, -4, 2, 11174523, 15, -62, -7, -8, -9, 396, -10};
     int T = 11174293; // Target sum
 
-	printSubsetSumFoliation(arr, T, 9);
+	printSubsetSumFoliation(arr, T);
 
     return 0;
 }
