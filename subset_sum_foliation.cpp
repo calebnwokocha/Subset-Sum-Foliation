@@ -226,7 +226,7 @@ int main() {
     vector<int> arr = {-625, -5, -1, -4, 2, 11174523, 15, -62, -7, -8, -9, 396, -10};
     int T = 11174293; // Target sum
 
-	printSubsetSumFoliation(arr, T);
+	printSubsetSum(arr, T);
 
     return 0;
 }
